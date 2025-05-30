@@ -1,0 +1,175 @@
+<ul class="nav nav-tabs custom-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button (click)="changeActiveTab('Add')" [ngClass]="{'active': ActiveTab === 'Add'}" class="nav-link custom-tab"
+            id="add-tab" type="button" role="tab" aria-controls="add" aria-selected="true">
+            <i class="bi bi-plus-circle"></i> Add
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button (click)="changeActiveTab('View')" [ngClass]="{'active': ActiveTab === 'View'}"
+            class="nav-link custom-tab" id="view-tab" type="button" role="tab" aria-controls="view"
+            aria-selected="false">
+            <i class="bi bi-eye"></i> View
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content pt-2" id="myTabContent">
+    <!-- Add Form -->
+    <div *ngIf="ActiveTab === 'Add'" class="tab-pane fade show active" id="add" role="tabpanel">
+        <div class="card shadow-lg inner-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>{{ selectedModuleId ? 'Edit Course' : 'Add Course' }}</span>
+                <small>All <span class="text-warning fw-bold">*</span> fields are mandatory.</small>
+            </div>
+            <div class="card-body">
+                <form [formGroup]="moduleForm" (ngSubmit)="onSubmit()">
+                    <div class="row">
+
+
+                        <div class="col-md-6 mb-3">
+                            <label for="CourseId" class="form-label fw-bold">Course</label>
+                            <select id="CourseId" formControlName="CourseId" class="form-select">
+                                <option value="0" selected="true">Select</option>
+                                <option *ngFor="let item of courses" [value]="item.course_id">
+                                    {{ item.course_name }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="ModuleName" class="form-label fw-bold">Module Name</label>
+                            <input type="text" id="ModuleName" formControlName="ModuleName" class="form-control"
+                                placeholder="Enter Module name" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="SequenceNo" class="form-label fw-bold">SequenceNo</label>
+                            <input type="text" id="SequenceNo" formControlName="SequenceNo" class="form-control" />
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label for="ModuleDescription" class="form-label fw-bold">Module Description</label>
+                            <textarea id="ModuleDescription" formControlName="ModuleDescription" class="form-control"
+                                placeholder="Enter Module description" cols="3" style="height:150px;"></textarea>
+                        </div>
+
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> {{ selectedModuleId ? 'Update' : 'Save' }}
+                            </button>
+                            <button type="button" class="btn btn-danger ms-2" (click)="resetForm()">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Table -->
+    <div *ngIf="ActiveTab === 'View'" class="tab-pane fade show active" id="view" role="tabpanel">
+        <div class="table-responsive">
+            <div class="row mt-2">
+                <div class="col-md-8">
+                    Page Size:
+                    <div class="btn-group pagesize" role="group" aria-label="Items per page">
+                        <button type="button" class="btn-custom" (click)="setItemsPerPage(10)">10</button>
+                        <button type="button" class="btn-custom" (click)="setItemsPerPage(50)">50</button>
+                        <button type="button" class="btn-custom" (click)="setItemsPerPage(100)">100</button>
+                        <button type="button" class="btn-custom" (click)="setItemsPerPage('all')">All</button>
+                    </div>
+                </div>
+                <div class="col-md-4 text-right d-flex ">
+                    <input type="text" class="form-control mb-2" [(ngModel)]="searchText" (input)="filterData()"
+                        placeholder="Search..." />
+                </div>
+            </div>
+
+            <table class="table table-bordered table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Sl#</th>
+                        <th (click)="sortData('CourseName')">Course</th>
+                        <th (click)="sortData('ModuleName')">Module</th>
+                        <th (click)="sortData('ModuleDescription')">Description</th>
+                        <th (click)="sortData('SequenceNo')">Sequence No.</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let module of paginatedData; let i = index">
+                        <td><span class="mobileScreen">Sl- </span>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+                        <td><span class="mobileScreen">Course - </span>{{ module.CourseName }}</td>
+                        <td><span class="mobileScreen">Module - </span>{{ module.ModuleName }}</td>
+                        <td><span class="mobileScreen">Description- </span>{{ module.ModuleDescription }}</td>
+                        <td>
+                            <span class="mobileScreen">Sequence No- </span>
+                            <input #seqInput type="number" class="form-control form-control-sm d-inline w-auto"
+                                [value]="module.SequenceNo"
+                                (change)="onSequenceNoChange(module.ModuleId, seqInput.value)" style="width: 80px;" />
+                        </td>
+                        <td class="action-buttons">
+                            <!-- Edit Button -->
+                            <button class="btn btn-primary btn-sm" (click)="editModule(module.ModuleId)">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>&nbsp;
+                            <!-- Delete Button -->
+                            <button class="btn btn-danger btn-sm" (click)="deleteModule(module.ModuleId)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>&nbsp;
+                            <button class="btn btn-danger btn-sm"
+                                (click)="AttachmentPopup(module.ModuleId,module.ModuleName,module.CourseName)">
+                                <i class="fa-solid fa-paperclip"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <div class="row w-100">
+                    <div class="col-md-10 col-sm-12">
+                        <span> Page {{ currentPage }} of {{ totalPages }} </span>
+                    </div>
+                    <div class="col-md-2 col-sm-12 mt-2 d-flex justify-content-end">
+                        <button (click)="goToPage(1)" [disabled]="currentPage === 1">First</button>
+                        <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Prev</button>
+                        <button (click)="goToPage(currentPage + 1)"
+                            [disabled]="currentPage === totalPages">Next</button>
+                        <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">Last</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Attachment Modal -->
+<div class="modal fade" id="attachmentModal" tabindex="-1" aria-labelledby="attachmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="attachmentModalLabel">Attachments</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Your attachment content goes here -->
+                <b class="bold">Attachments for: {{ selectedAttachmentModuleName }} ({{ selectedAttachmentCourseName
+                    }})</b> &nbsp;
+                <div *ngFor="let file of attachmentFiles; let i = index" class="mb-2">
+                    <input type="file" (change)="onFileChange($event, i)" />
+                    <button type="button" class="btn btn-sm btn-danger ms-2" (click)="removeAttachmentInput(i)">
+                        Remove
+                    </button>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm mt-2" (click)="addAttachmentInput()">
+                    Add File
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

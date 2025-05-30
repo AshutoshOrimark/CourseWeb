@@ -1,0 +1,9 @@
+.signupCard {
+    width: 650px;
+}
+
+@media (max-width: 576px) {
+    .signupCard {
+        width: 100%;
+    }
+}

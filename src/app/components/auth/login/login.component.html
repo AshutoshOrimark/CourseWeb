@@ -1,0 +1,73 @@
+<main class="d-flex w-100 bg-light">
+    <div class="container d-flex flex-column">
+        <div class="row vh-100">
+            <div class="col-sm-10 col-md-8 col-lg-6 col-xl-5 mx-auto d-table h-100">
+                <div class="d-table-cell align-middle">
+
+                    <div class="text-center mt-4">
+                        <h1 class="h2 fw-bold">Welcome Back!</h1>
+                        <p class="lead text-muted">
+                            Sign in to your account to continue
+                        </p>
+                    </div>
+
+                    <div class="card shadow-lg border-0">
+                        <div class="card-body p-4">
+                            <div class="m-sm-4">
+                                <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                                    <!-- Email Field -->
+                                    <div class="mb-4">
+                                        <label for="email" class="form-label fw-semibold">Email Address</label>
+                                        <input class="form-control form-control-lg" type="email" id="email" placeholder="Enter your email" formControlName="email" />
+                                        <div class="text-danger mt-1" *ngIf="hasDisplayableError('email')">
+                                            <ng-container [ngSwitch]="form.controls['email'].errors | firstkey">
+                                                <div *ngSwitchCase="'required'">Please enter your email address.</div>
+                                                <div *ngSwitchCase="'email'">Please enter a valid email address.</div>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+
+                                    <!-- Password Field -->
+                                    <div class="mb-4">
+                                        <label for="password" class="form-label fw-semibold">Password</label>
+                                        <input class="form-control form-control-lg" type="password" id="password" placeholder="Enter your password" formControlName="password" />
+                                        <div class="text-danger mt-1" *ngIf="hasDisplayableError('password')">
+                                            <ng-container [ngSwitch]="form.controls['password'].errors | firstkey">
+                                                <div *ngSwitchCase="'required'">Please enter your password.</div>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+
+                                    <!-- Remember Me Checkbox -->
+                                    <div class="form-check mb-4">
+                                        <input id="rememberMe" type="checkbox" class="form-check-input" value="remember-me" name="remember-me" checked>
+                                        <label class="form-check-label text-small" for="rememberMe">Remember me</label>
+                                    </div>
+
+                                    <!-- Submit Button -->
+                                    <div class="d-grid gap-2 mt-4">
+                                        <button type="submit" class="btn btn-lg btn-primary fw-bold">Sign In</button>
+                                    </div>
+
+                                    <!-- Social Login Buttons -->
+                                    <div class="d-grid gap-2 mt-4">
+                                        <button type="button" class="btn btn-danger w-100"><i class="bi bi-google"></i> Google</button>
+                                        <button type="button" class="btn btn-primary w-100"><i class="bi bi-facebook"></i> Facebook</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <p class="text-muted">
+                            Don't have an account? 
+                            <a routerLink="/signup" class="fw-bold text-primary">Sign Up</a>
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

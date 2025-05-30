@@ -1,0 +1,11 @@
+.about-us-section {
+    background-color: #f8f9fa;
+}
+
+.about-us-section img {
+    transition: transform 0.3s ease;
+}
+
+.about-us-section img:hover {
+    transform: scale(1.05);
+}

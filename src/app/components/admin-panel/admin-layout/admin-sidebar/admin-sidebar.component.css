@@ -1,0 +1,101 @@
+.sidebar{
+    height: 100vh;
+    overflow-y: auto;
+}
+
+.sidebar-brand {
+    color: #f8f9fa;
+    display: block;
+    font-size: 1.55rem;
+    font-weight: 600;
+    padding: 1.15rem 4.5rem;
+    
+}
+
+/* Sidebar link hover effect */
+.sidebar-link {
+    color: #6c757d;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.sidebar-link:hover {
+    color: #fff;
+    background-color: #007bff;
+    border-radius: 4px;
+}
+
+/* Ensure icons are visible on hover */
+.sidebar-link:hover i {
+    color: #fff !important; /* Ensure the icon color changes on hover */
+}
+
+/* Active link styling */
+.sidebar-link.active {
+    color: #fff;
+    background-color: #007bff;
+    border-radius: 4px;
+}
+
+/* Active link styling */
+.sidebar-item .active {
+    color: #007bff; /* Adjust to match your theme */
+    font-weight: bold;
+}
+
+/* Ensure icons are visible in active main menu */
+.sidebar-item.active > .sidebar-link i {
+    color: #007bff !important; /* Ensure the icon color matches the active theme */
+}
+
+/* Active parent menu styling */
+.sidebar-item.active > .sidebar-link {
+    background-color: #f8f9fa; /* Adjust to match your theme */
+    color: #007bff !important;
+    font-weight: bold;
+}
+
+/* Collapse menu styling */
+.collapse.show {
+    display: block !important;
+}
+
+/* Submenu indentation */
+.collapse .sidebar-link {
+    font-size: 0.9rem;
+    padding-left: 1.5rem;
+}
+
+/* Active submenu link styling */
+.collapse .sidebar-link.active {
+    color: #fff !important;
+    background-color: #007bff !important;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+/* Ensure icons are visible in active submenu */
+.collapse .sidebar-item .sidebar-link.active i {
+    color: #fff !important; /* Ensure the icon color is white for active submenus */
+}
+
+/* Active submenu link styling */
+.collapse .sidebar-item .sidebar-link.active {
+    color: #fff !important;
+    background-color: #007bff !important;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+/* Ensure icons are visible in all states */
+.sidebar-item.active i,
+.collapse .sidebar-item .sidebar-link.active i {
+    color: inherit !important; /* Inherit the color from the parent element */
+}
+
+/* Sidebar header styling */
+.sidebar-header {
+    font-size: 0.75rem;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+}

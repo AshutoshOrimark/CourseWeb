@@ -1,0 +1,38 @@
+/* Default carousel height */
+.carousel-inner img {
+    height: 500px; /* Default height for larger screens */
+    object-fit: cover; /* Ensures the image scales properly */
+}
+
+/* Default carousel text styles */
+.carousel-caption {
+    bottom: 20%; /* Adjust text position */
+    text-align: center; /* Center-align text */
+    color: #fff; /* Ensure text is white for visibility */
+}
+
+/* Add a semi-transparent background for better contrast */
+.carousel-caption {
+    background: rgba(0, 0, 0, 0.5); /* Black background with 50% opacity */
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Adjustments for mobile screens */
+@media (max-width: 768px) {
+    .carousel-inner img {
+        height: 300px; /* Increase height for mobile screens */
+    }
+
+    .carousel-caption {
+        bottom: 10%; /* Adjust text position */
+    }
+
+    .carousel-caption h2 {
+        font-size: 1.5rem; /* Smaller heading size for mobile */
+    }
+
+    .carousel-caption p {
+        font-size: 1rem; /* Smaller paragraph size for mobile */
+    }
+}

@@ -1,0 +1,21 @@
+.contact-us-section {
+    background-color: #f0f8ff; /* AliceBlue */
+    padding: 50px 0; /* Added padding for better spacing */
+}
+
+.contact-us-section iframe {
+    height: 500px; /* Increased map height */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.contact-us-section iframe:hover {
+    transform: scale(1.02); /* Slight zoom effect on hover */
+}
+
+.contact-us-section .form-container {
+    max-height: 500px; /* Matches the new map height */
+    /* overflow-y: auto; Enables scrolling if content exceeds height */
+    padding-right: 10px; /* Adds padding for better scrolling experience */
+}

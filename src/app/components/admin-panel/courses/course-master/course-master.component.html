@@ -1,0 +1,140 @@
+<ul class="nav nav-tabs custom-tabs" id="myTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button (click)="changeActiveTab('Add')" [ngClass]="{'active': ActiveTab === 'Add'}" class="nav-link custom-tab"
+      id="add-tab" type="button" role="tab" aria-controls="add" aria-selected="true">
+      <i class="bi bi-plus-circle"></i> Add
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button (click)="changeActiveTab('View')" [ngClass]="{'active': ActiveTab === 'View'}" class="nav-link custom-tab"
+      id="view-tab" type="button" role="tab" aria-controls="view" aria-selected="false">
+      <i class="bi bi-eye"></i> View
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content pt-2" id="myTabContent">
+  <!-- Add Form -->
+  <div *ngIf="ActiveTab === 'Add'" class="tab-pane fade show active" id="add" role="tabpanel">
+    <div class="card shadow-lg inner-card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>{{ selectedCourseId ? 'Edit Course' : 'Add Course' }}</span>
+        <small>All <span class="text-warning fw-bold">*</span> fields are mandatory.</small>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="courseForm" (ngSubmit)="onSubmit()">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="course_name" class="form-label fw-bold">Course Name</label>
+              <input type="text" id="course_name" formControlName="course_name" class="form-control"
+                placeholder="Enter course name" />
+            </div>
+            <div class="col-md-6 mb-3 mt-4">              
+              <label for="is_public" class="form-label fw-bold">Is Public</label>&nbsp;
+              <input type="checkbox" id="is_public" formControlName="is_public" class="form-check-input" />
+            </div>
+            <div class="col-md-12 mb-3">
+              <label for="course_description" class="form-label fw-bold">Course Description</label>
+              <textarea id="course_description" formControlName="course_description" class="form-control"
+                placeholder="Enter course description" cols="3" style="height:150px;"></textarea>
+            </div>            
+            <div class="col-md-6 mb-3">
+              <label for="actual_price" class="form-label fw-bold">Actual Price</label>
+              <input type="number" id="actual_price" formControlName="actual_price" class="form-control" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="discounted_price" class="form-label fw-bold">Discounted Price</label>
+              <input type="number" id="discounted_price" formControlName="discounted_price" class="form-control" />
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="video_path" class="form-label fw-bold">Video Path</label>
+              <input type="text" id="video_path" formControlName="video_path" class="form-control" />
+            </div>
+            
+            <div class="d-flex justify-content-end">
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-save"></i> {{ selectedCourseId ? 'Update' : 'Save' }}
+              </button>
+              <button type="button" class="btn btn-danger ms-2" (click)="resetForm()">
+                <i class="bi bi-x-circle"></i> Cancel
+              </button>
+            </div>
+          </div> 
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Table -->
+  <div *ngIf="ActiveTab === 'View'" class="tab-pane fade show active" id="view" role="tabpanel">
+    <div class="table-responsive">
+      <div class="row mt-2">
+        <div class="col-md-8">
+          Page Size:
+          <div class="btn-group pagesize" role="group" aria-label="Items per page">            
+            <button type="button" class="btn-custom" (click)="setItemsPerPage(10)">10</button>
+            <button type="button" class="btn-custom" (click)="setItemsPerPage(50)">50</button>
+            <button type="button" class="btn-custom" (click)="setItemsPerPage(100)">100</button>
+            <button type="button" class="btn-custom" (click)="setItemsPerPage('all')">All</button>
+          </div>
+        </div>
+        <div class="col-md-4 text-right d-flex ">          
+          <input type="text" class="form-control mb-2" [(ngModel)]="searchText" (input)="filterData()"
+            placeholder="Search..." />
+        </div>
+      </div>
+
+      <table class="table table-bordered table-striped table-hover">
+        <thead>
+          <tr>
+            <th>Sl#</th>
+            <th (click)="sortData('course_name')">Name</th>
+            <th (click)="sortData('course_description')">Description</th>
+            <th (click)="sortData('actual_price')">A.Price</th>
+            <th (click)="sortData('discounted_price')">D.Price</th>
+            <th (click)="sortData('is_public')">Public</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let course of paginatedData; let i = index">
+            <td><span class="mobileScreen">Sl- </span>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+            <td><span class="mobileScreen">Name- </span>{{ course.course_name }}</td>
+            <td><span class="mobileScreen">Description- </span>{{ course.course_description }}</td>
+            <td><span class="mobileScreen">Actual Price- </span>{{ course.actual_price }}</td>
+            <td><span class="mobileScreen">Discounted Price- </span>{{ course.discounted_price }}</td>
+            <td>
+              <span class="mobileScreen">Public-</span>
+              <span *ngIf="course.is_public; else notPublic">Yes</span>
+              <ng-template #notPublic>No</ng-template>
+            </td>
+            <td class="action-buttons">
+              <!-- Edit Button -->
+              <button class="btn btn-primary btn-sm" (click)="editCourse(course.course_id)">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>&nbsp;
+              <!-- Delete Button -->
+              <button class="btn btn-danger btn-sm" (click)="deleteCourse(course.course_id)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="pagination">
+        <div class="row w-100">
+          <div class="col-md-10 col-sm-12">
+            <span> Page {{ currentPage }} of {{ totalPages }} </span>
+          </div>
+          <div class="col-md-2 col-sm-12 mt-2 d-flex justify-content-end">
+            <button (click)="goToPage(1)" [disabled]="currentPage === 1">First</button>
+            <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Prev</button>
+            <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages">Next</button>
+            <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">Last</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

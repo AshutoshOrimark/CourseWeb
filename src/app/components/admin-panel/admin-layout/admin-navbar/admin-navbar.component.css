@@ -1,0 +1,13 @@
+.dropdown-toggle::after {
+   
+    border-top: .3em transparent;
+   
+}
+
+.dropdown .dropdown-menu.show {
+    min-width: 300px;
+    max-height: 350px;
+    overflow-y: auto;
+    z-index: 9999;
+}
+

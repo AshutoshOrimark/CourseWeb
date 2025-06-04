@@ -1,14 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule, AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule } from '@angular/forms';
 import { CourseMasterService } from '../../../../services/course-master.service';
 import { ToastrService } from 'ngx-toastr';
+import { HttpClient } from '@angular/common/http';
+import { ImageUploadService } from '../../../../services/image-upload.service';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { CategoryMasterService } from '../../../../services/category-master.service';
+
 
 @Component({
     selector: 'app-course-master',
-    imports: [CommonModule, ReactiveFormsModule, FormsModule],
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        FormsModule, 
+        
+    ],
     templateUrl: './course-master.component.html',
-    styleUrl: './course-master.component.css'
+    styleUrl: './course-master.component.css',
+    schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class CourseMasterComponent implements OnInit {
     ActiveTab = 'Add';
@@ -23,78 +34,90 @@ export class CourseMasterComponent implements OnInit {
     selectedCourseId: string | null = null;
     sortColumn: string = '';
     sortDirection: boolean = true;
-
+    stars: number[] = [1, 2, 3, 4, 5];
+    hoverRating: number | null = null;
+    categories: any[] = [];
+    course_information: string = '';
 
     constructor(
         private fb: FormBuilder,
         private courseService: CourseMasterService,
-        private toastr: ToastrService
+        private imageUploadService: ImageUploadService,
+        private toastr: ToastrService,
+        private categoryService: CategoryMasterService,
+
     ) { }
 
-    ngOnInit(): void {
-        const currentDate = new Date();
-        const formattedDate = currentDate.toISOString().split('T')[0];
-        this.courseForm = this.fb.group({
-            course_name: ['', Validators.required],
-            course_description: ['', Validators.required],
-            video_path: ['', [Validators.required]],
-            actual_price: [Validators.required],
-            discounted_price: [Validators.required],
-            discount_percentage: [0], // Initialize with a default value
-            is_public: [false], // Default to false
-        });
-
-        this.loadCourses();
-    }
+    ngOnInit() {
+      this.courseForm = this.fb.group({
+          course_name: ['', Validators.required],
+          course_description: ['', Validators.required],
+          course_info: [this.course_information || '', Validators.required],
+          course_language: [''],
+          banner_image: [''],
+          author: [''],
+          rating: [0, Validators.required],
+          actual_price: [0, [Validators.required, Validators.min(0)]],
+          discounted_price: [0, [Validators.required, Validators.min(0)]],
+          is_premium: [false],
+          is_best_seller: [false],
+          video_path: ['', Validators.required],
+          is_public: [false],
+          category_id: ['', Validators.required],
+          // created_by, status, created_on are handled by backend
+      });
+  
+      this.loadCourses();
+      this.loadcategories();
+  }
 
     changeActiveTab(tabName: string) {
         this.ActiveTab = tabName;
         if (tabName === 'Add') this.resetForm();
     }
 
+    loadcategories(): void {
+        this.categoryService.getCategory().subscribe({
+            next: (data) => {
+                console.log(data);
+                this.categories = data;                
+            },
+            error: (err) => {
+                console.error(err);
+                this.toastr.error('Failed to load categories.', 'Error');
+            }
+        });
+    }
     onSubmit(): void {
         if (this.courseForm.invalid) {
             this.toastr.warning('Please fill all required fields.', 'Validation Error');
             return;
         }
-
-        // Auto-calculate discount_percentage
-        const actualPrice = this.courseForm.get('actual_price')?.value;
-        const discountedPrice = this.courseForm.get('discounted_price')?.value;
-
-        if (actualPrice && discountedPrice) {
-            const discountPercentage = ((actualPrice - discountedPrice) / actualPrice) * 100;
-            this.courseForm.patchValue({ discount_percentage: discountPercentage.toFixed(2) });
-        }
-
-        if (this.courseForm.valid) {
-            if (this.selectedCourseId) {
-                this.courseService.updateCourse(this.selectedCourseId, this.courseForm.value).subscribe({
-                    next: () => {
-                        this.toastr.success('Course updated successfully!', 'Success');
-                        this.resetForm();
-                        this.loadCourses();
-                    },
-                    error: (err) => {
-                        console.error(err);
-                        this.toastr.error('Failed to update course.', 'Error');
-                    },
-                });
-            } else {
-                this.courseService.createCourse(this.courseForm.value).subscribe({
-                    next: () => {
-                        this.toastr.success('Course created successfully!', 'Success');
-                        this.resetForm();
-                        this.loadCourses();
-                    },
-                    error: (err) => {
-                        console.error(err);
-                        this.toastr.error('Failed to create course.', 'Error');
-                    },
-                });
-            }
+        console.log(this.courseForm.value);
+        if (this.selectedCourseId) {
+            this.courseService.updateCourse(this.selectedCourseId, this.courseForm.value).subscribe({
+                next: () => {
+                    this.toastr.success('Course updated successfully!', 'Success');
+                    this.resetForm();
+                    this.loadCourses();
+                },
+                error: (err) => {
+                    console.error(err);
+                    this.toastr.error('Failed to update course.', 'Error');
+                },
+            });
         } else {
-            this.toastr.warning('Please fill all required fields.', 'Warning');
+            this.courseService.createCourse(this.courseForm.value).subscribe({
+                next: () => {
+                    this.toastr.success('Course created successfully!', 'Success');
+                    this.resetForm();
+                    this.loadCourses();
+                },
+                error: (err) => {
+                    console.error(err);
+                    this.toastr.error('Failed to create course.', 'Error');
+                },
+            });
         }
     }
 
@@ -116,19 +139,32 @@ export class CourseMasterComponent implements OnInit {
             next: (course) => {
                 this.changeActiveTab('Add');
                 this.selectedCourseId = courseId.toString();
-
+                // Patch form
                 this.courseForm.patchValue({
                     course_name: course.course_name,
                     course_description: course.course_description,
-                    video_path: course.video_path,
+                    course_info: course.course_info,
+                    course_language: course.course_language,
+                    banner_image: course.banner_image,
+                    author: course.author,
+                    rating: course.rating,
                     actual_price: course.actual_price,
                     discounted_price: course.discounted_price,
-                    discount_percentage: course.discount_percentage,
+                    is_premium: course.is_premium,
+                    is_best_seller: course.is_best_seller,
+                    video_path: course.video_path,
                     is_public: course.is_public,
+                    category_id: course.category_id,
                 });
+                // Set Trix editor content after patch (2 seconds delay)
+                setTimeout(() => {
+                    const trixEditor = document.querySelector('trix-editor[input="courseInfoInput"]') as any;
+                    if (trixEditor) {
+                        trixEditor.editor.loadHTML(course.course_info || '');
+                    }
+                }, 2000);
             },
             error: (err) => {
-                console.error(err);
                 this.toastr.error('Failed to fetch course details.', 'Error');
             }
         });
@@ -140,6 +176,7 @@ export class CourseMasterComponent implements OnInit {
                 next: () => {
                     this.toastr.success('Course deleted successfully!', 'Success');
                     this.loadCourses();
+                    this.filterData();
                 },
                 error: (err) => {
                     console.error(err);
@@ -169,16 +206,30 @@ export class CourseMasterComponent implements OnInit {
     }
 
     resetForm(): void {
-        const currentDate = new Date();
-        const formattedDate = currentDate.toISOString().split('T')[0];
         this.courseForm.reset({
             course_name: '',
             course_description: '',
-            duration_in_weeks: '',
-            start_date: formattedDate,
-            end_date: formattedDate
+            course_info: '',
+            course_language: '',
+            banner_image: '',
+            author: '',
+            rating: 0,
+            actual_price: 0,
+            discounted_price: 0,
+            is_premium: false,
+            is_best_seller: false,
+            video_path: '',
+            is_public: false,
+            category_id: '',
         });
         this.selectedCourseId = null;
+        // Clear Trix editor content (2 seconds delay)
+        setTimeout(() => {
+            const trixEditor = document.querySelector('trix-editor[input="courseInfoInput"]') as any;
+            if (trixEditor) {
+                trixEditor.editor.loadHTML('');
+            }
+        }, 2000);
     }
 
     sortData(column: string): void {
@@ -204,24 +255,74 @@ export class CourseMasterComponent implements OnInit {
         this.filterData();
     }
 
-    private formatDate(date: string): string {
-        const parsedDate = new Date(date);
-        const year = parsedDate.getFullYear();
-        const month = String(parsedDate.getMonth() + 1).padStart(2, '0');
-        const day = String(parsedDate.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+    onBannerImageChange(event: any): void {
+        const file: File = event.target.files[0];
+        if (file) {
+            this.imageUploadService.uploadCourseImage(file).subscribe({
+                next: (res) => {
+                    this.courseForm.patchValue({ banner_image: res.path });
+                    this.toastr.success('Banner image uploaded!', 'Success');
+                },
+                error: () => {
+                    this.toastr.error('Failed to upload image.', 'Error');
+                }
+            });
+        }
     }
 
-    // Custom validator to check if start_date is less than or equal to end_date
-    private dateRangeValidator(): ValidatorFn {
-        return (formGroup: AbstractControl): ValidationErrors | null => {
-            const startDate = formGroup.get('start_date')?.value;
-            const endDate = formGroup.get('end_date')?.value;
-
-            if (startDate && endDate && new Date(startDate) > new Date(endDate)) {
-                return { dateRangeInvalid: true };
-            }
-            return null;
-        };
+    setRating(rating: number) {
+        this.courseForm.get('rating')?.setValue(rating);
     }
+
+    setHoverRating(star: number | null, event: MouseEvent) {
+        // Optional: implement hover effect if you want
+        this.hoverRating = star;
+    }
+
+    getStarType(star: number): 'full' | 'half' | 'empty' {
+        const rating = this.hoverRating !== null ? this.hoverRating : this.courseForm.get('rating')?.value || 0;
+        if (rating >= star) {
+            return 'full';
+        } else if (rating >= star - 0.5) {
+            return 'half';
+        } else {
+            return 'empty';
+        }
+    }
+
+    // Called when Trix editor changes
+    onTrixChange(event: any) {
+        // Always get the latest HTML from the editor
+        const trixEditor = event.target;
+        const value = trixEditor.editor.getDocument().toString().trim() === '' ? '' : trixEditor.innerHTML;
+        this.courseForm.get('course_info')?.setValue(value);
+    }
+
+    // Optional: If you want to handle ngModelChange as well
+    onTrixModelChange(value: string) {
+        this.courseForm.get('course_info')?.setValue(value);
+    }
+
+    onStarClick(event: MouseEvent, star: number) {
+        const { left, width } = (event.target as HTMLElement).getBoundingClientRect();
+        const x = event.clientX - left;
+        const isHalf = x < width / 2;
+        const value = isHalf ? star - 0.5 : star;
+        this.setRating(value);
+    }
+
+    onStarHover(event: MouseEvent, star: number) {
+        const { left, width } = (event.target as HTMLElement).getBoundingClientRect();
+        const x = event.clientX - left;
+        const isHalf = x < width / 2;
+        this.hoverRating = isHalf ? star - 0.5 : star;
+    }
+
+    // TinyMCE config (optional, for toolbar etc.)
+    public tinymceConfig = {
+        height: 200,
+        menubar: false,
+        plugins: 'lists link image table code',
+        toolbar: 'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist outdent indent | removeformat | code'
+    };
 }

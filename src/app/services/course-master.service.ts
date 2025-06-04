@@ -39,4 +39,11 @@ export class CourseMasterService {
     console.log('Deleting course with ID:', courseId);
     return this.http.delete(`${this.baseURL}/${courseId}`);
   }
+
+  // Upload banner image
+  uploadBannerImage(file: File): Observable<{ path: string }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post<{ path: string }>(`${environment.apiUrl}/upload`, formData);
+  }
 }

@@ -3,3 +3,7 @@
     padding: 1rem 1rem;
     
 }
+.main{
+    height: 100vh;
+    overflow: auto;
+}

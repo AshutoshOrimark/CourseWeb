@@ -1,0 +1,112 @@
+<ul class="nav nav-tabs custom-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button (click)="changeActiveTab('Add')" [ngClass]="{'active': ActiveTab === 'Add'}" class="nav-link custom-tab"
+            id="add-tab" type="button" role="tab" aria-controls="add" aria-selected="true">
+            <i class="bi bi-plus-circle"></i> Add
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button (click)="changeActiveTab('View')" [ngClass]="{'active': ActiveTab === 'View'}"
+            class="nav-link custom-tab" id="view-tab" type="button" role="tab" aria-controls="view"
+            aria-selected="false">
+            <i class="bi bi-eye"></i> View
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content pt-2" id="myTabContent">
+    <!-- Add Form -->
+    <div *ngIf="ActiveTab === 'Add'" class="tab-pane fade show active" id="add" role="tabpanel">
+        <div class="card shadow-lg inner-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>{{ selectedCategoryId ? 'Edit Course' : 'Add Course' }}</span>
+                <small>All <span class="text-warning fw-bold">*</span> fields are mandatory.</small>
+            </div>
+            <div class="card-body">
+                <form [formGroup]="categoryForm" (ngSubmit)="onSubmit()">
+                    <div class="row">                        
+
+                        <div class="col-md-6 mb-3">
+                            <label for="CategoryName" class="form-label fw-bold">Category Name</label>
+                            <input type="text" id="CategoryName" formControlName="CategoryName" class="form-control"
+                                placeholder="Enter Category name" />
+                        </div>         
+
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> {{ selectedCategoryId ? 'Update' : 'Save' }}
+                            </button>
+                            <button type="button" class="btn btn-danger ms-2" (click)="resetForm()">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Table -->
+    <div *ngIf="ActiveTab === 'View'" class="tab-pane fade show active" id="view" role="tabpanel">
+        <div class="table-responsive">
+            <div class="row mt-2">
+                <div class="col-md-8">
+                    Page Size:
+                    <div class="btn-group pagesize" role="group" aria-label="Items per page">
+                        <button type="button" class="btn-custom" (click)="setItemsPerPage(10)">10</button>
+                        <button type="button" class="btn-custom" (click)="setItemsPerPage(50)">50</button>
+                        <button type="button" class="btn-custom" (click)="setItemsPerPage(100)">100</button>
+                        <button type="button" class="btn-custom" (click)="setItemsPerPage('all')">All</button>
+                    </div>
+                </div>
+                <div class="col-md-4 text-right d-flex ">
+                    <input type="text" class="form-control mb-2" [(ngModel)]="searchText" (input)="filterData()"
+                        placeholder="Search..." />
+                </div>
+            </div>
+
+            <table class="table table-bordered table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Sl#</th>
+                        <th (click)="sortData('CategoryName')">Category Name</th>                        
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let category of paginatedData; let i = index">
+                        <td><span class="mobileScreen">Sl- </span>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
+                        <td><span class="mobileScreen">Course - </span>{{ category.CategoryName }}</td>                        
+                        <td class="action-buttons">
+                            <!-- Edit Button -->
+                            <button class="btn btn-primary btn-sm" (click)="editModule(category.CategoryId)">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>&nbsp;
+                            <!-- Delete Button -->
+                            <button class="btn btn-danger btn-sm" (click)="deleteModule(category.CategoryId)">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                           
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="pagination">
+                <div class="row w-100">
+                    <div class="col-md-10 col-sm-12">
+                        <span> Page {{ currentPage }} of {{ totalPages }} </span>
+                    </div>
+                    <div class="col-md-2 col-sm-12 mt-2 d-flex justify-content-end">
+                        <button (click)="goToPage(1)" [disabled]="currentPage === 1">First</button>
+                        <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Prev</button>
+                        <button (click)="goToPage(currentPage + 1)"
+                            [disabled]="currentPage === totalPages">Next</button>
+                        <button (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">Last</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

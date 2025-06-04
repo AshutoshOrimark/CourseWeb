@@ -10,7 +10,8 @@ import { CourseModule } from '../models/courseModuleModel';
 })
 export class CourseModuleService {
 
-  private baseURL = `${environment.apiUrl}/courseModule`;  
+  private baseURL = `${environment.apiUrl}/courseModule`; 
+  private baseURL1 = `${environment.apiUrl}/media`; 
 
   constructor(private http: HttpClient) { }
    
@@ -40,5 +41,13 @@ export class CourseModuleService {
   deleteModule(ModuleId: string): Observable<any> {
     console.log('Deleting course with ID:', ModuleId);
     return this.http.delete(`${this.baseURL}/${ModuleId}`);
+  }
+
+  // Get YouTube video duration
+  getYoutubeDuration(url: string): Observable<{ duration: string }> {
+    return this.http.post<{ duration: string }>(
+      `${this.baseURL1}/getYoutubeDuration`,
+      { url }
+    );
   }
 }

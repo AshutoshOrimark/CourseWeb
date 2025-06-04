@@ -2,8 +2,7 @@
     <div class="sidebar-content js-simplebar">
         <!-- Sidebar Brand -->
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-            <i class="align-middle" data-feather="layers"></i>
-            <span class="align-middle ms-2">VidyaRoop</span>
+            <img src="img/photos/vidyaroop-logo.png" alt="VidyaRoop Logo" class="logo" />
         </a>
 
         <ul class="sidebar-nav mt-4">
@@ -23,6 +22,13 @@
                     <i class="align-middle ms-auto" data-feather="chevron-down"></i>
                 </a>
                 <ul class="collapse list-unstyled ps-4" id="coursesMenu" [ngClass]="{'show': isCoursesMenuOpen}">
+                     <li class="sidebar-item" [ngClass]="{'active': isActive('/admin/category')}">
+                        <a class="sidebar-link d-flex align-items-center" [routerLink]="'/admin/category'" (click)="activateSubmenu('courses')">
+                            <i class="align-middle me-2" data-feather="layers"></i>
+                            <span class="align-middle">Category Master</span>
+                        </a>
+                    </li>
+                    
                     <li class="sidebar-item" [ngClass]="{'active': isActive('/admin/course')}">
                         <a class="sidebar-link d-flex align-items-center" [routerLink]="'/admin/course'" (click)="activateSubmenu('courses')">
                             <i class="align-middle me-2" data-feather="user"></i>
@@ -38,7 +44,7 @@
                     <li class="sidebar-item" [ngClass]="{'active': isActive('/admin/video')}">
                         <a class="sidebar-link d-flex align-items-center" [routerLink]="'/admin/video'" (click)="activateSubmenu('courses')">
                             <i class="align-middle me-2" data-feather="layers"></i>
-                            <span class="align-middle">Video</span>
+                            <span class="align-middle">Course-Progress</span>
                         </a>
                     </li>
                 </ul>

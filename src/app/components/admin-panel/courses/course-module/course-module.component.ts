@@ -30,6 +30,9 @@ export class CourseModuleComponent {
   selectedAttachmentModuleName: string | null = null;
   selectedAttachmentCourseName: string | null = null;
   attachmentFiles: File[] = [];
+  newVideoUrl: string = '';
+  videoUrls: { url: string, duration: string }[] = []; 
+  isFetchingDuration: boolean = false;
 
 
 
@@ -311,18 +314,34 @@ export class CourseModuleComponent {
     }
   }
 
-  addAttachmentInput() {
-    this.attachmentFiles.push(null as any); // Add a placeholder for a new file input
+  fetchYoutubeDuration() {
+    if (!this.newVideoUrl) return;
+    this.isFetchingDuration = true;
+    this.moduleService.getYoutubeDuration(this.newVideoUrl).subscribe({
+      next: (res) => {
+        this.videoUrls.push({ url: this.newVideoUrl, duration: res.duration });
+        this.newVideoUrl = '';
+        this.isFetchingDuration = false;
+      },
+      error: (err) => {
+        alert('Failed to fetch duration: ' + (err.error?.detail || err.message));
+        this.isFetchingDuration = false;
+      }
+    });
   }
 
-  removeAttachmentInput(index: number) {
-    this.attachmentFiles.splice(index, 1);
-  }
+  // addAttachmentInput() {
+  //   this.attachmentFiles.push(null as any); // Add a placeholder for a new file input
+  // }
 
-  onFileChange(event: any, index: number) {
-    const file = event.target.files[0];
-    this.attachmentFiles[index] = file;
-  }
+  // removeAttachmentInput(index: number) {
+  //   this.attachmentFiles.splice(index, 1);
+  // }
+
+  // onFileChange(event: any, index: number) {
+  //   const file = event.target.files[0];
+  //   this.attachmentFiles[index] = file;
+  // }
 }
 
 

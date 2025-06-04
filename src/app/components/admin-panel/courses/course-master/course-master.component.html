@@ -24,33 +24,104 @@
       <div class="card-body">
         <form [formGroup]="courseForm" (ngSubmit)="onSubmit()">
           <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="course_name" class="form-label fw-bold">Course Name</label>
+            <div class="col-md-4 col-sm-12 mb-3">
+              <label for="course_name" class="form-label fw-bold">Course Name *</label>
               <input type="text" id="course_name" formControlName="course_name" class="form-control"
                 placeholder="Enter course name" />
             </div>
-            <div class="col-md-6 mb-3 mt-4">              
-              <label for="is_public" class="form-label fw-bold">Is Public</label>&nbsp;
-              <input type="checkbox" id="is_public" formControlName="is_public" class="form-check-input" />
+            <div class="col-md-4 col-sm-12 mb-3">
+              <label for="course_language" class="form-label fw-bold">Course Language</label>
+              <select id="course_language" formControlName="course_language" class="form-select">
+                <option value="">Select Language</option>
+                <option value="English">English</option>
+                <option value="Hindi">Hindi</option>
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="author" class="form-label fw-bold">Author</label>
+              <input type="text" id="author" formControlName="author" class="form-control"
+                placeholder="Enter author name" />
             </div>
             <div class="col-md-12 mb-3">
-              <label for="course_description" class="form-label fw-bold">Course Description</label>
+              <label for="course_description" class="form-label fw-bold">Course Description *</label>
               <textarea id="course_description" formControlName="course_description" class="form-control"
-                placeholder="Enter course description" cols="3" style="height:150px;"></textarea>
-            </div>            
-            <div class="col-md-6 mb-3">
-              <label for="actual_price" class="form-label fw-bold">Actual Price</label>
-              <input type="number" id="actual_price" formControlName="actual_price" class="form-control" />
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="discounted_price" class="form-label fw-bold">Discounted Price</label>
-              <input type="number" id="discounted_price" formControlName="discounted_price" class="form-control" />
-            </div>
-            <div class="col-md-6 mb-3">
-              <label for="video_path" class="form-label fw-bold">Video Path</label>
-              <input type="text" id="video_path" formControlName="video_path" class="form-control" />
+                placeholder="Enter course description" cols="3" style="height:100px;"></textarea>
             </div>
             
+            <div class="col-md-4 mb-3">
+              <label for="banner_image" class="form-label fw-bold">Banner Image</label>
+              <input type="file" id="banner_image" (change)="onBannerImageChange($event)" class="form-control"
+                accept="image/*" />
+              <div *ngIf="courseForm.get('banner_image')?.value">
+                <small>Current: <a [href]="courseForm.get('banner_image')?.value" target="_blank">{{ courseForm.get('banner_image')?.value }}</a></small>
+              </div>
+            </div>        
+            <div class="col-md-4 mb-3">
+              <label for="video_path" class="form-label fw-bold"> Introduction Video Url *</label>
+              <input type="text" id="video_path" formControlName="video_path" class="form-control" />
+            </div>    
+            <div class="col-md-4 mb-3">
+              <label class="form-label fw-bold">Rating</label>
+              <div class="star-rating" style="font-size: 2rem; color: #b87333;">
+                <ng-container *ngFor="let star of stars">
+                  <i
+                    class="bi"
+                    [ngClass]="{
+                      'bi-star-fill': getStarType(star) === 'full',
+                      'bi-star-half': getStarType(star) === 'half',
+                      'bi-star': getStarType(star) === 'empty'
+                    }"
+                    (mousemove)="onStarHover($event, star)"
+                    (mouseleave)="hoverRating = null"
+                    (click)="onStarClick($event, star)"
+                    style="cursor: pointer;"
+                  ></i>
+                </ng-container>
+                <span class="ms-2" style="font-weight:bold; font-size:1.5rem;">{{ courseForm.get('rating')?.value || 0 }}</span>
+              </div>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="actual_price" class="form-label fw-bold">Actual Price *</label>
+              <input type="number" id="actual_price" formControlName="actual_price" class="form-control" />
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="discounted_price" class="form-label fw-bold">Discounted Price *</label>
+              <input type="number" id="discounted_price" formControlName="discounted_price" class="form-control" />
+            </div>
+            <div class="col-md-4 col-sm-12 mb-3">
+              <label for="category_id" class="form-label fw-bold">Category *</label>
+              <select id="category_id" formControlName="category_id" class="form-select">
+                <option value="">Select Category</option>
+                <option *ngFor="let cat of categories" [value]="cat.CategoryId">{{ cat.CategoryName }}</option>
+              </select>
+            </div>
+            <div class="col-md-12 mb-3">
+              <label for="course_info" class="form-label fw-bold">Course Info</label>
+              <input
+                id="courseInfoInput"
+                type="hidden"
+                formControlName="course_info"
+                name="course_info"
+              />
+              <trix-editor
+                input="courseInfoInput"
+                (trix-change)="onTrixChange($event)"
+              ></trix-editor>
+            </div>
+            <div class="col-md-12 mb-3 mt-4">
+              <input type="checkbox" id="is_premium" formControlName="is_premium" class="form-check-input" />
+              <label for="is_premium" class="form-label fw-bold"> &nbsp;Is Premium</label>&nbsp;
+              
+            </div>
+            <div class="col-md-12 mb-3 mt-4">
+              <input type="checkbox" id="is_best_seller" formControlName="is_best_seller" class="form-check-input" />
+              <label for="is_best_seller" class="form-label fw-bold"> &nbsp;Is Best Seller</label>&nbsp;              
+            </div>
+            <div class="col-md-12 mb-3 mt-4">
+              <input type="checkbox" id="is_public" formControlName="is_public" class="form-check-input" />
+              <label for="is_public" class="form-label fw-bold"> &nbsp;Is Public</label>
+              
+            </div>
             <div class="d-flex justify-content-end">
               <button type="submit" class="btn btn-primary">
                 <i class="bi bi-save"></i> {{ selectedCourseId ? 'Update' : 'Save' }}
@@ -59,7 +130,7 @@
                 <i class="bi bi-x-circle"></i> Cancel
               </button>
             </div>
-          </div> 
+          </div>
         </form>
       </div>
     </div>
@@ -71,14 +142,14 @@
       <div class="row mt-2">
         <div class="col-md-8">
           Page Size:
-          <div class="btn-group pagesize" role="group" aria-label="Items per page">            
+          <div class="btn-group pagesize" role="group" aria-label="Items per page">
             <button type="button" class="btn-custom" (click)="setItemsPerPage(10)">10</button>
             <button type="button" class="btn-custom" (click)="setItemsPerPage(50)">50</button>
             <button type="button" class="btn-custom" (click)="setItemsPerPage(100)">100</button>
             <button type="button" class="btn-custom" (click)="setItemsPerPage('all')">All</button>
           </div>
         </div>
-        <div class="col-md-4 text-right d-flex ">          
+        <div class="col-md-4 text-right d-flex ">
           <input type="text" class="form-control mb-2" [(ngModel)]="searchText" (input)="filterData()"
             placeholder="Search..." />
         </div>
@@ -89,31 +160,47 @@
           <tr>
             <th>Sl#</th>
             <th (click)="sortData('course_name')">Name</th>
-            <th (click)="sortData('course_description')">Description</th>
+            <th (click)="sortData('course_language')">Language</th>
+            <th (click)="sortData('author')">Author</th>
+            <th (click)="sortData('rating')">Rating</th>
             <th (click)="sortData('actual_price')">A.Price</th>
             <th (click)="sortData('discounted_price')">D.Price</th>
+            <th (click)="sortData('is_premium')">Premium</th>
+            <th (click)="sortData('is_best_seller')">Best Seller</th>
             <th (click)="sortData('is_public')">Public</th>
+            
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let course of paginatedData; let i = index">
+          <tr *ngFor="let course of paginatedData, let i = index">
             <td><span class="mobileScreen">Sl- </span>{{ (currentPage - 1) * itemsPerPage + i + 1 }}</td>
-            <td><span class="mobileScreen">Name- </span>{{ course.course_name }}</td>
-            <td><span class="mobileScreen">Description- </span>{{ course.course_description }}</td>
+            <td><span class="mobileScreen">Course Name- </span>{{ course.course_name }}</td>
+            <td><span class="mobileScreen">Language- </span>{{ course.course_language }}</td>
+            <td><span class="mobileScreen">Author- </span>{{ course.author }}</td>
+            <td><span class="mobileScreen">Rating- </span>{{ course.rating }}</td>
             <td><span class="mobileScreen">Actual Price- </span>{{ course.actual_price }}</td>
             <td><span class="mobileScreen">Discounted Price- </span>{{ course.discounted_price }}</td>
             <td>
-              <span class="mobileScreen">Public-</span>
+              <span class="mobileScreen">Premium- </span>
+              <span *ngIf="course.is_premium; else notPremium">Yes</span>
+              <ng-template #notPremium>No</ng-template>
+            </td>
+            <td>
+              <span class="mobileScreen">Best Seller- </span>
+              <span *ngIf="course.is_best_seller; else notBestSeller">Yes</span>
+              <ng-template #notBestSeller>No</ng-template>
+            </td>
+            <td>
+              <span class="mobileScreen">Public- </span>
               <span *ngIf="course.is_public; else notPublic">Yes</span>
               <ng-template #notPublic>No</ng-template>
             </td>
+           
             <td class="action-buttons">
-              <!-- Edit Button -->
               <button class="btn btn-primary btn-sm" (click)="editCourse(course.course_id)">
                 <i class="fa-solid fa-pen-to-square"></i>
               </button>&nbsp;
-              <!-- Delete Button -->
               <button class="btn btn-danger btn-sm" (click)="deleteCourse(course.course_id)">
                 <i class="fa-solid fa-trash"></i>
               </button>

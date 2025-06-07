@@ -4,6 +4,8 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormsModule, A
 import { CourseMasterService } from '../../../../services/course-master.service';
 import { CourseModuleService } from '../../../../services/course-module.service';
 import { ToastrService } from 'ngx-toastr';
+import { ModuleVideoRequest, ModuleVideoResponse } from '../../../../models/courseModuleModel';
+
 
 @Component({
   selector: 'app-course-module',
@@ -11,7 +13,7 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './course-module.component.html',
   styleUrl: './course-module.component.css'
 })
-export class CourseModuleComponent {
+export class CourseModuleComponent implements OnInit {
   ActiveTab = 'Add';
   moduleForm!: FormGroup;
   searchText: string = '';
@@ -20,21 +22,24 @@ export class CourseModuleComponent {
   totalPages: number = 0;
   paginatedData: any[] = [];
   courses: any[] = [];
+  coursesView: any[] = [];
   modules: any[] = [];
   filteredModules: any[] = [];
   selectedModuleId: string | null = null;
-  selectedCourseId: string | null = null;
+  selectedCourseId: string | null = "0";
   sortColumn: string = '';
   sortDirection: boolean = true;
+
+  // Attachment/Video Modal
   selectedAttachmentModuleId: number | null = null;
   selectedAttachmentModuleName: string | null = null;
   selectedAttachmentCourseName: string | null = null;
+  selectedAttachmentCourseId: number | null = null;
   attachmentFiles: File[] = [];
   newVideoUrl: string = '';
-  videoUrls: { url: string, duration: string }[] = []; 
+  moduleVideoName: string = '';
   isFetchingDuration: boolean = false;
-
-
+  videoUrls: ModuleVideoResponse[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -44,16 +49,14 @@ export class CourseModuleComponent {
   ) { }
 
   ngOnInit(): void {
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().split('T')[0];
     this.moduleForm = this.fb.group({
       CourseId: ['0', Validators.required],
       ModuleName: ['', Validators.required],
       ModuleDescription: ['', Validators.required],
       SequenceNo: ['', [Validators.required]],
-      Status: ["Active"], // Default to active
+      Status: ["Active"],
     });
-    
+
     this.loadCourses();
     this.loadModules();
   }
@@ -62,7 +65,7 @@ export class CourseModuleComponent {
     this.ActiveTab = tabName;
     if (tabName === 'Add') {
       this.resetForm();
-      this.moduleForm.get('CourseId')?.setValue('0'); // Reset CourseId to '0'
+      this.moduleForm.get('CourseId')?.setValue('0');
     }
   }
 
@@ -115,9 +118,8 @@ export class CourseModuleComponent {
   loadCourses(): void {
     this.courseService.getCourses().subscribe({
       next: (data) => {
-        
         this.courses = data;
-        this.filterData();
+        this.coursesView = data;
       },
       error: (err) => {
         console.error(err);
@@ -127,9 +129,8 @@ export class CourseModuleComponent {
   }
 
   loadModules(): void {
-    this.moduleService.getModules().subscribe({
+    this.moduleService.getModules(this.selectedCourseId ? Number(this.selectedCourseId) : 0).subscribe({
       next: (data) => {
-        console.log(data);
         this.modules = data;
         this.filterData();
       },
@@ -144,14 +145,14 @@ export class CourseModuleComponent {
     this.moduleService.getModuleById(ModuleId.toString()).subscribe({
       next: (module) => {
         this.changeActiveTab('Add');
-        this.selectedModuleId = ModuleId.toString();      
+        this.selectedModuleId = ModuleId.toString();
 
-        this.moduleForm.patchValue({     
-          CourseId: module.CourseId.toString(), // Ensure CourseId is a string     
+        this.moduleForm.patchValue({
+          CourseId: module.CourseId.toString(),
           ModuleName: module.ModuleName,
           ModuleDescription: module.ModuleDescription,
           SequenceNo: module.SequenceNo.toString(),
-          Status: module.Status, // <-- should be module.Status
+          Status: module.Status,
         });
       },
       error: (err) => {
@@ -165,7 +166,7 @@ export class CourseModuleComponent {
     if (confirm('Are you sure you want to delete this course?')) {
       this.moduleService.deleteModule(ModuleId.toString()).subscribe({
         next: () => {
-          this.moduleService.getModules().subscribe({
+          this.moduleService.getModules(this.selectedCourseId ? Number(this.selectedCourseId) : 0).subscribe({
             next: (data) => {
               this.modules = data;
               this.filterData();
@@ -208,14 +209,12 @@ export class CourseModuleComponent {
   }
 
   resetForm(): void {
-    const currentDate = new Date();
-    const formattedDate = currentDate.toISOString().split('T')[0];
     this.moduleForm.reset({
-      CourseId: '0', // or '0' if that's your default
+      CourseId: '0',
       ModuleName: '',
       ModuleDescription: '',
       SequenceNo: '',
-      Status: 'Active', // <-- Ensure Status is set
+      Status: 'Active',
     });
     this.selectedModuleId = null;
   }
@@ -235,9 +234,9 @@ export class CourseModuleComponent {
 
   setItemsPerPage(items: number | string): void {
     if (items === 'all') {
-      this.itemsPerPage = this.filteredModules.length; // Show all items
+      this.itemsPerPage = this.filteredModules.length;
     } else {
-      this.itemsPerPage = Number(items); // Convert to number if not already
+      this.itemsPerPage = Number(items);
     }
     this.currentPage = 1;
     this.filterData();
@@ -251,7 +250,6 @@ export class CourseModuleComponent {
     return `${year}-${month}-${day}`;
   }
 
-  // Custom validator to check if start_date is less than or equal to end_date
   private dateRangeValidator(): ValidatorFn {
     return (formGroup: AbstractControl): ValidationErrors | null => {
       const startDate = formGroup.get('start_date')?.value;
@@ -264,7 +262,6 @@ export class CourseModuleComponent {
     };
   }
 
-  // Add this method to handle inline SequenceNo patch update
   onSequenceNoChange(moduleId: number, newValue: string) {
     const sequenceNo = Number(newValue);
     if (!Number.isNaN(sequenceNo)) {
@@ -273,7 +270,6 @@ export class CourseModuleComponent {
           const updatedModule = {
             ...module,
             SequenceNo: sequenceNo.toString(),
-            // Always use the CourseId from the module being updated
             CourseId: module.CourseId
           };
           this.moduleService.updateModule(moduleId.toString(), updatedModule).subscribe({
@@ -294,54 +290,102 @@ export class CourseModuleComponent {
     }
   }
 
-   
-   AttachmentPopup(moduleId: number, moduleName: string, courseName:string): void {
+  // --- Attachment/Video Modal Logic ---
+
+  AttachmentPopup(moduleId: number, moduleName: string, courseName: string, courseId?: number): void {
     this.selectedAttachmentModuleId = moduleId;
     this.selectedAttachmentModuleName = moduleName.toString();
     this.selectedAttachmentCourseName = courseName;
-    // Show the Bootstrap modal
+    this.selectedAttachmentCourseId = courseId || null;
+    this.getModuleVideos();
+
     const modalElement = document.getElementById('attachmentModal');
     if (modalElement) {
       const modal = new (window as any).bootstrap.Modal(modalElement);
-      // Listen for modal close event to reset selectedAttachmentModuleId
       modalElement.addEventListener('hidden.bs.modal', () => {
-        this.selectedAttachmentModuleId = null;
-        this.selectedAttachmentModuleName = null;
-        this.selectedAttachmentCourseName = null;
-        this.attachmentFiles = [];
+        this.resetAttachmentModal();
       }, { once: true });
       modal.show();
     }
   }
 
+  getModuleVideos(): void {
+    if (!this.selectedAttachmentModuleId || !this.selectedAttachmentCourseId) {
+      this.videoUrls = [];
+      return;
+    }
+    this.moduleService.getModuleVideos(this.selectedAttachmentCourseId, this.selectedAttachmentModuleId).subscribe({
+      next: (videos) => this.videoUrls = videos,
+      error: () => this.videoUrls = []
+    });
+  }
+
   fetchYoutubeDuration() {
-    if (!this.newVideoUrl) return;
+    if (!this.moduleVideoName || !this.newVideoUrl || !this.selectedAttachmentModuleId || !this.selectedAttachmentCourseId) return;
     this.isFetchingDuration = true;
     this.moduleService.getYoutubeDuration(this.newVideoUrl).subscribe({
-      next: (res) => {
-        this.videoUrls.push({ url: this.newVideoUrl, duration: res.duration });
-        this.newVideoUrl = '';
-        this.isFetchingDuration = false;
+      next: (res) => {        
+        const videoData: ModuleVideoRequest = {
+          course_id: this.selectedAttachmentCourseId!,
+          module_id: this.selectedAttachmentModuleId!,
+          video_title: this.moduleVideoName,
+          video_url: this.newVideoUrl,
+          duration_in_seconds: res.duration,
+          sequence_no: this.videoUrls.length + 1,
+          created_by: 'admin'
+        };
+        this.moduleService.insertModuleVideo(videoData).subscribe({
+          next: () => {
+            this.isFetchingDuration = false;
+            this.moduleVideoName = '';
+            this.newVideoUrl = '';
+            this.getModuleVideos();
+          },
+          error: () => {
+            this.isFetchingDuration = false;
+          }
+        });
       },
-      error: (err) => {
-        alert('Failed to fetch duration: ' + (err.error?.detail || err.message));
+      error: () => {
         this.isFetchingDuration = false;
       }
     });
   }
 
-  // addAttachmentInput() {
-  //   this.attachmentFiles.push(null as any); // Add a placeholder for a new file input
-  // }
+  parseDuration(duration: string): number {
+    // If it's a plain number string, just return it as seconds
+    if (/^\d+$/.test(duration)) {
+      return parseInt(duration, 10);
+    }
+    // ISO 8601 duration (e.g., PT1H2M3S)
+    const regex = /PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/;
+    const matches = duration.match(regex);
+    if (!matches) return 0;
+    const hours = parseInt(matches[1] || '0', 10);
+    const minutes = parseInt(matches[2] || '0', 10);
+    const seconds = parseInt(matches[3] || '0', 10);
+    return hours * 3600 + minutes * 60 + seconds;
+  }
 
-  // removeAttachmentInput(index: number) {
-  //   this.attachmentFiles.splice(index, 1);
-  // }
+  deleteVideoUrl(index: number): void {
+    const video = this.videoUrls[index];
+    if (!video || !video.video_id) return;
+    this.moduleService.deleteModuleVideo(video.video_id).subscribe({
+      next: () => this.getModuleVideos(),
+      error: () => {}
+    });
+  }
 
-  // onFileChange(event: any, index: number) {
-  //   const file = event.target.files[0];
-  //   this.attachmentFiles[index] = file;
-  // }
+  resetAttachmentModal() {
+    this.moduleVideoName = '';
+    this.newVideoUrl = '';
+    this.videoUrls = [];
+    this.isFetchingDuration = false;
+    this.selectedAttachmentModuleId = null;
+    this.selectedAttachmentModuleName = null;
+    this.selectedAttachmentCourseName = null;
+    this.selectedAttachmentCourseId = null;
+  }
 }
 
 

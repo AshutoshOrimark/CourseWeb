@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, HostListener } from '@angular/core';
 import { Router, NavigationStart, NavigationEnd, RouterOutlet } from '@angular/router';
 import { PageLoaderComponent } from './components/page-loader/page-loader.component';
 import { environment } from '../environments/environment';
 import { Title } from '@angular/platform-browser';
 
-declare var feather: any;
+// declare var feather: any;
 declare var bootstrap: any;
 
 @Component({
@@ -36,10 +36,10 @@ export class AppComponent implements OnInit {
 
         this.titleService.setTitle(environment.appName);
 
-        // Reinitialize Feather icons
-        if (feather) {
-          feather.replace();
-        }
+        // // Reinitialize Feather icons
+        // if (feather) {
+        //   feather.replace();
+        // }
 
         // Reinitialize Bootstrap components
         this.reinitializeBootstrapComponents();
@@ -59,5 +59,28 @@ export class AppComponent implements OnInit {
     collapseTriggerList.forEach(collapseTriggerEl => {
       new bootstrap.Collapse(collapseTriggerEl, { toggle: false });
     });
+  }
+
+  // Disable right-click
+  @HostListener('document:contextmenu', ['$event'])
+  onRightClick(event: MouseEvent) {
+    if (environment.disableRightClick) {
+      event.preventDefault();
+    }
+  }
+
+  // Disable F12, Ctrl+Shift+I/C/J/U
+  @HostListener('document:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    if (environment.disableDevTools) {
+      if (
+        event.key === 'F12' ||
+        (event.ctrlKey && event.shiftKey && ['I', 'J', 'C'].includes(event.key.toUpperCase())) ||
+        (event.ctrlKey && event.key.toUpperCase() === 'U')
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }
   }
 }

@@ -3,27 +3,28 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Course } from '../models/courseModel';
-import { CourseModule } from '../models/courseModuleModel';
+import { CourseModule, ModuleVideoRequest, ModuleVideoResponse } from '../models/courseModuleModel';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class CourseModuleService {
 
-  private baseURL = `${environment.apiUrl}/courseModule`; 
-  private baseURL1 = `${environment.apiUrl}/media`; 
+  private baseURL = `${environment.apiUrl}/courseModule`;
+  private baseURL1 = `${environment.apiUrl}/media`;
 
   constructor(private http: HttpClient) { }
-   
+
   // Create a new Module
   createModule(CourseModule: CourseModule): Observable<any> {
     return this.http.post(`${this.baseURL}`, CourseModule);
   }
 
-  // Get all Modules
-  getModules(): Observable<CourseModule[]> {    
-    console.log('Fetching all course modules');
-    return this.http.get<CourseModule[]>(`${this.baseURL}`);
+  // Get all Modules for a specific course
+  getModules(courseId: number): Observable<CourseModule[]> {
+    console.log('Fetching all course modules for courseId:', courseId);
+    return this.http.get<CourseModule[]>(`${this.baseURL}?course_id=${courseId}`);
   }
 
   // Get a Module by ID
@@ -49,5 +50,23 @@ export class CourseModuleService {
       `${this.baseURL1}/getYoutubeDuration`,
       { url }
     );
+  }
+
+  // -------- Module Video Methods --------
+
+  // Insert a new video into ModuleVideo table
+  insertModuleVideo(videoData: ModuleVideoRequest): Observable<ModuleVideoResponse> {
+    
+    return this.http.post<ModuleVideoResponse>(`${this.baseURL}/moduleVideo/`, videoData);
+  }
+
+  // Get all videos for a given course and module
+  getModuleVideos(courseId: number, moduleId: number): Observable<ModuleVideoResponse[]> {
+    return this.http.get<ModuleVideoResponse[]>(`${this.baseURL}/moduleVideo/?course_id=${courseId}&module_id=${moduleId}`);
+  }
+
+  // Delete a video by its VideoId
+  deleteModuleVideo(videoId: number): Observable<any> {
+    return this.http.delete(`${this.baseURL}/moduleVideo/${videoId}`);
   }
 }

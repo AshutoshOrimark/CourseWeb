@@ -47,6 +47,12 @@
                             <span class="align-middle">Course-Progress</span>
                         </a>
                     </li>
+                      <li class="sidebar-item" [ngClass]="{'active': isActive('/admin/youtube')}">
+                        <a class="sidebar-link d-flex align-items-center" [routerLink]="'/admin/youtube'" (click)="activateSubmenu('courses')">
+                            <i class="align-middle me-2" data-feather="layers"></i>
+                            <span class="align-middle">Youtube Player</span>
+                        </a>
+                    </li>
                 </ul>
             </li>
 

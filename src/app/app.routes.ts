@@ -9,6 +9,7 @@ import { AuthGuard } from './authGuard/auth.guard';
 import { CourseModuleComponent } from './components/admin-panel/courses/course-module/course-module.component';
 import { VideoPlayerComponent } from './components/admin-panel/courses/video-player/video-player.component';
 import { CategoryMasterComponent } from './components/admin-panel/courses/category-master/category-master.component';
+import { YoutubePlayerComponent } from './components/admin-panel/courses/youtube-player/youtube-player.component';
 
 
 export const routes: Routes = [
@@ -32,6 +33,7 @@ export const routes: Routes = [
             { path: 'course', component: CourseMasterComponent, canActivate: [AuthGuard] },
             { path: 'module', component: CourseModuleComponent, canActivate: [AuthGuard] },
             { path: 'video', component: VideoPlayerComponent, canActivate: [AuthGuard] },
+             { path: 'youtube', component: YoutubePlayerComponent, canActivate: [AuthGuard] },
             { path: 'category', component: CategoryMasterComponent, canActivate: [AuthGuard] },
             { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
         ]

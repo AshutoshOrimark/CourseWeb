@@ -9,6 +9,13 @@
   scale: 1.9;
 }
 
+/* Remove scale on mobile view */
+@media (max-width: 600px) {
+  .logo {
+    scale: 1;
+  }
+}
+
 .logo:hover {
   transform: scale(1.05);
 }

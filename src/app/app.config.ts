@@ -10,7 +10,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([AuthInterceptor])),
+    provideHttpClient(),
     provideToastr({
       positionClass: 'toast-top-right', // Set position to top-right
       timeOut: 3000, // Optional: Set timeout for notifications

@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
 })
 export class ImageUploadService { 
   private baseURL = `${environment.apiUrl}/media`;  
-  private uploadUrl = `${this.baseURL}/uploadCourseImage`; 
+  private uploadUrl = `${this.baseURL}/api/uploadCourseImage`; 
 
   constructor(private http: HttpClient) {}
 

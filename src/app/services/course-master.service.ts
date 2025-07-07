@@ -9,7 +9,7 @@ import { Course } from '../models/courseModel';
 })
 export class CourseMasterService {
 
-  private baseURL = `${environment.apiUrl}/course`;
+  private baseURL = `${environment.apiUrl}/api/course`;
 
   constructor(private http: HttpClient) {}
 

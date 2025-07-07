@@ -1,0 +1,48 @@
+
+  <h4 class="mb-4 fw-bold text-primary">
+    <i class="bi bi-bar-chart-steps me-2"></i>{{ courseName }}
+  </h4>
+  <div class="mb-4">
+    <div class="p-3 bg-light border-start border-4 border-primary rounded shadow-sm d-flex align-items-center">
+      <i class="bi bi-info-circle-fill text-primary fs-4 me-3"></i>
+      <span class="fs-6 text-secondary">{{ courseDescription }}</span>
+    </div>
+  </div>
+  <div *ngIf="courseProgressList.length > 0; else noData">
+    <div class="accordion" id="courseAccordion">
+      <ng-container *ngFor="let module of groupedModules; let i = index">
+        <div class="accordion-item shadow-sm mb-3 rounded-3 border-0">
+          <h2 class="accordion-header" id="heading{{i}}">
+            <button class="accordion-button collapsed bg-light fw-semibold" type="button" data-bs-toggle="collapse"
+              [attr.data-bs-target]="'#collapse' + i" aria-expanded="false" [attr.aria-controls]="'collapse' + i">
+              <i class="bi bi-journal-bookmark-fill text-secondary me-2"></i>
+              {{ module.moduleName }}
+            </button>
+          </h2>
+          <div [id]="'collapse' + i" class="accordion-collapse collapse" [attr.aria-labelledby]="'heading' + i"
+            data-bs-parent="#courseAccordion">
+            <div class="accordion-body bg-white">
+              <div class="mb-3">
+                <strong class="text-secondary">Description:</strong>
+                <div class="fst-italic text-muted">{{ module.moduleDescription }}</div>
+              </div>
+              <div *ngFor="let video of module.videos" class="mb-4 ps-2 border-start border-3 border-primary">
+                <div class="fw-bold mb-1 d-flex align-items-center">
+                  <i class="bi bi-play-circle-fill text-primary me-2"></i>
+                  {{ video.VideoTitle }}
+                  <span class="badge bg-info text-dark ms-2">
+                    {{ video.DurationInSeconds }}s
+                  </span>
+                </div>
+                <app-dailymotion-player [dailymotionUrl]="video.VideoUrl"></app-dailymotion-player>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+  <ng-template #noData>
+    <div class="alert alert-info shadow-sm mt-4">No course progress data available.</div>
+  </ng-template>
+

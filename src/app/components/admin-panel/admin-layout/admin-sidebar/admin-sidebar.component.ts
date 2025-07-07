@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnInit } from '@angular/core'; // <-- Add OnInit
 import { RouterLink, Router } from '@angular/router';
 
 // Extend the Window interface to include the feather and bootstrap properties
@@ -16,12 +16,16 @@ declare global {
   styleUrls: ['./admin-sidebar.component.css'],
   imports: [RouterLink, CommonModule]
 })
-export class AdminSidebarComponent implements AfterViewInit {
+export class AdminSidebarComponent implements OnInit, AfterViewInit { // <-- Add OnInit
   isCoursesMenuOpen = false;
   isHelpdeskMenuOpen = false;
   isReportsMenuOpen = false;
 
   constructor(private router: Router) {}
+
+  ngOnInit(): void {
+    this.setActiveMenuOnLoad(); // <-- Move here
+  }
 
   ngAfterViewInit(): void {
     // Reinitialize Feather icons
@@ -32,18 +36,18 @@ export class AdminSidebarComponent implements AfterViewInit {
     // Reinitialize Bootstrap components
     this.reinitializeBootstrapComponents();
 
-    this.setActiveMenuOnLoad();
+    // REMOVE this.setActiveMenuOnLoad();
   }
 
   setActiveMenuOnLoad(): void {
     // Check the current route and activate the corresponding menu
-    if (this.router.url.includes('/admin/dashboard')) {
+    if (this.router.url.includes('/dashboard/home')) {
       this.closeAllMenus();
-    } else if (this.router.url.includes('/admin/course') || this.router.url.includes('/admin/module')) {
+    } else if (this.router.url.includes('/course')) {
       this.isCoursesMenuOpen = true;
-    } else if (this.router.url.includes('/admin/helpdesk')) {
+    } else if (this.router.url.includes('/helpdesk')) {
       this.isHelpdeskMenuOpen = true;
-    } else if (this.router.url.includes('/admin/reports')) {
+    } else if (this.router.url.includes('/reports')) {
       this.isReportsMenuOpen = true;
     }
   }

@@ -9,7 +9,7 @@ import { Category } from '../models/categoryModel';
 })
 export class CategoryMasterService {
 
-  private baseURL = `${environment.apiUrl}/category`;  
+  private baseURL = environment.apiUrl+"/api/category";  
   
     constructor(private http: HttpClient) { }
      

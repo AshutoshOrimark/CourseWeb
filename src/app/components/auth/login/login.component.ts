@@ -62,7 +62,7 @@ export class LoginComponent implements OnInit {
           localStorage.setItem('user_role', encryptData(userRole));
 
           this.setTokenTimeout(token); // Set token timeout after login
-          this.router.navigate(['/admin/dashboard']); // Correct path
+          this.router.navigate(['/dashboard']); // Correct path
           this.toastr.success('Logged in successfully!', 'Success', {
             timeOut: 3000
           });

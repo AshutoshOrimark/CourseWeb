@@ -11,8 +11,8 @@ import { CourseModule, ModuleVideoRequest, ModuleVideoResponse } from '../models
 
 export class CourseModuleService {
 
-  private baseURL = `${environment.apiUrl}/courseModule`;
-  private baseURL1 = `${environment.apiUrl}/media`;
+  private baseURL = `${environment.apiUrl}/api/courseModule`;
+  private baseURL1 = `${environment.apiUrl}/api/media`;
 
   constructor(private http: HttpClient) { }
 
@@ -47,7 +47,7 @@ export class CourseModuleService {
   // Get YouTube video duration
   getYoutubeDuration(url: string): Observable<{ duration: string }> {
     return this.http.post<{ duration: string }>(
-      `${this.baseURL1}/getYoutubeDuration`,
+      `${this.baseURL1}/getDailymotionDuration`,
       { url }
     );
   }

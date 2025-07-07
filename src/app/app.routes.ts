@@ -7,9 +7,16 @@ import { DashboardComponent } from './components/admin-panel/dashboard/dashboard
 import { CourseMasterComponent } from './components/admin-panel/courses/course-master/course-master.component';
 import { AuthGuard } from './authGuard/auth.guard';
 import { CourseModuleComponent } from './components/admin-panel/courses/course-module/course-module.component';
-import { VideoPlayerComponent } from './components/admin-panel/courses/video-player/video-player.component';
 import { CategoryMasterComponent } from './components/admin-panel/courses/category-master/category-master.component';
 import { YoutubePlayerComponent } from './components/admin-panel/courses/youtube-player/youtube-player.component';
+import { DailymotionPlayerComponent } from './components/admin-panel/courses/dailymotion-player/dailymotion-player.component';
+import { TicketsComponent } from './components/admin-panel/helpdesk/tickets/tickets.component';
+import { FaqComponent } from './components/admin-panel/helpdesk/faq/faq.component';
+import { ErrorReportComponent } from './components/admin-panel/reports/error-report/error-report.component';
+import { LoginReportComponent } from './components/admin-panel/reports/login-report/login-report.component';
+import { SalesReportComponent } from './components/admin-panel/reports/sales-report/sales-report.component';
+import { UserReportComponent } from './components/admin-panel/reports/user-report/user-report.component';
+import { CourseProgressComponent } from './components/admin-panel/courses/course-progress/course-progress.component';
 
 
 export const routes: Routes = [
@@ -27,15 +34,47 @@ export const routes: Routes = [
         component: SignupComponent,
     },    
     {
-        path: 'admin', 
+        path: 'dashboard',
+        component: AdminBaseComponent,
+        children: [          
+            
+            { path: 'home', component: DashboardComponent, canActivate: [AuthGuard] },
+            
+        
+        ]
+    },
+    {
+        path: 'course', 
         component: AdminBaseComponent,
         children: [
-            { path: 'course', component: CourseMasterComponent, canActivate: [AuthGuard] },
-            { path: 'module', component: CourseModuleComponent, canActivate: [AuthGuard] },
-            { path: 'video', component: VideoPlayerComponent, canActivate: [AuthGuard] },
-             { path: 'youtube', component: YoutubePlayerComponent, canActivate: [AuthGuard] },
-            { path: 'category', component: CategoryMasterComponent, canActivate: [AuthGuard] },
-            { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+            
+            
+            { path: 'category-master', component: CategoryMasterComponent, canActivate: [AuthGuard] },
+            { path: 'course-master', component: CourseMasterComponent, canActivate: [AuthGuard] },
+            { path: 'module-master', component: CourseModuleComponent, canActivate: [AuthGuard] },
+            { path: 'course-progress', component: CourseProgressComponent, canActivate: [AuthGuard] },
+            
+        
+        ]
+    },
+    {
+        path: 'helpdesk', 
+        component: AdminBaseComponent,
+        children: [
+            { path: 'tickets', component: TicketsComponent, canActivate: [AuthGuard] },
+            { path: 'faq', component: FaqComponent, canActivate: [AuthGuard] },            
+            
+        ]
+    },
+    {
+        path: 'reports', 
+        component: AdminBaseComponent,
+        children: [
+            { path: 'error-report', component: ErrorReportComponent, canActivate: [AuthGuard] },
+            { path: 'login-report', component: LoginReportComponent, canActivate: [AuthGuard] },    
+            { path: 'sales-report', component: SalesReportComponent, canActivate: [AuthGuard] },
+            { path: 'user-report', component: UserReportComponent, canActivate: [AuthGuard] },        
+            
         ]
     }
 ];

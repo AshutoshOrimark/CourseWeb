@@ -9,7 +9,7 @@
             <!-- Dashboard Menu -->
             <li class="sidebar-item" [ngClass]="{'active': isActive('/dashboard')}">
                 <a class="sidebar-link d-flex align-items-center" [routerLink]="'/dashboard'" (click)="closeAllMenus()">
-                    <i class="align-middle me-2" data-feather="sliders"></i>
+                    <i class="align-middle me-2 bi bi-sliders"></i>
                     <span class="align-middle">Dashboard</span>
                 </a>
             </li>
@@ -17,33 +17,33 @@
             <!-- Courses Menu with Submenus -->
             <li class="sidebar-item" [ngClass]="{'active': isCoursesMenuOpen || isSubmenuActive(['/course/category-master', '/course/course-master', '/course/module-master'])}">
                 <a class="sidebar-link d-flex align-items-center collapsed" data-bs-toggle="collapse" href="#coursesMenu" role="button" aria-expanded="false" aria-controls="coursesMenu" (click)="toggleMenu('courses')">
-                    <i class="align-middle me-2" data-feather="book"></i>
+                    <i class="align-middle me-2 bi bi-book"></i>
                     <span class="align-middle">Courses</span>
-                    <i class="align-middle ms-auto" data-feather="chevron-down"></i>
+                    <i class="align-middle ms-auto bi bi-chevron-down"></i>
                 </a>
                 <ul class="collapse list-unstyled ps-4" id="coursesMenu" [ngClass]="{'show': isCoursesMenuOpen}">
                      <li class="sidebar-item" [ngClass]="{'active': isActive('/course/category-master')}">
                         <a class="sidebar-link d-flex align-items-center" [routerLink]="'/course/category-master'" (click)="activateSubmenu('courses')">
-                            <i class="align-middle me-2" data-feather="layers"></i>
+                            <i class="align-middle me-2 bi bi-layers"></i>
                             <span class="align-middle">Category Master</span>
                         </a>
                     </li>
                     
                     <li class="sidebar-item" [ngClass]="{'active': isActive('/course/course-master')}">
                         <a class="sidebar-link d-flex align-items-center" [routerLink]="'/course/course-master'" (click)="activateSubmenu('courses')">
-                            <i class="align-middle me-2" data-feather="user"></i>
+                            <i class="align-middle me-2 bi bi-person"></i>
                             <span class="align-middle">Course Master</span>
                         </a>
                     </li>
                     <li class="sidebar-item" [ngClass]="{'active': isActive('/course/module-master')}">
                         <a class="sidebar-link d-flex align-items-center" [routerLink]="'/course/module-master'" (click)="activateSubmenu('courses')">
-                            <i class="align-middle me-2" data-feather="layers"></i>
+                            <i class="align-middle me-2 bi bi-layers"></i>
                             <span class="align-middle">Course Module</span>
                         </a>
                     </li>
                     <li class="sidebar-item" [ngClass]="{'active': isActive('/course/video-player')}">
                         <a class="sidebar-link d-flex align-items-center" [routerLink]="'/course/course-progress'" (click)="activateSubmenu('courses')">
-                            <i class="align-middle me-2" data-feather="layers"></i>
+                            <i class="align-middle me-2 bi bi-layers"></i>
                             <span class="align-middle">Course-Progress</span>
                         </a>
                     </li>                     
@@ -53,20 +53,20 @@
             <!-- Helpdesk Menu with Submenus -->
             <li class="sidebar-item" [ngClass]="{'active': isHelpdeskMenuOpen || isSubmenuActive(['/helpdesk/tickets', '/admin/helpdesk/faq'])}">
                 <a class="sidebar-link d-flex align-items-center collapsed" data-bs-toggle="collapse" href="#helpdeskMenu" role="button" aria-expanded="false" aria-controls="helpdeskMenu" (click)="toggleMenu('helpdesk')">
-                    <i class="align-middle me-2" data-feather="help-circle"></i>
+                    <i class="align-middle me-2 bi bi-question-circle"></i>
                     <span class="align-middle">Helpdesk</span>
-                    <i class="align-middle ms-auto" data-feather="chevron-down"></i>
+                    <i class="align-middle ms-auto bi bi-chevron-down"></i>
                 </a>
                 <ul class="collapse list-unstyled ps-4" id="helpdeskMenu" [ngClass]="{'show': isHelpdeskMenuOpen}">
                     <li class="sidebar-item" [ngClass]="{'active': isActive('/helpdesk/tickets')}">
                         <a class="sidebar-link d-flex align-items-center" [routerLink]="'/helpdesk/tickets'" (click)="activateSubmenu('helpdesk')">
-                            <i class="align-middle me-2" data-feather="file-text"></i>
+                            <i class="align-middle me-2 bi bi-file-earmark-text"></i>
                             <span class="align-middle">Tickets</span>
                         </a>
                     </li>
                     <li class="sidebar-item" [ngClass]="{'active': isActive('/helpdesk/faq')}">
                         <a class="sidebar-link d-flex align-items-center" [routerLink]="'/helpdesk/faq'" (click)="activateSubmenu('helpdesk')">
-                            <i class="align-middle me-2" data-feather="info"></i>
+                            <i class="align-middle me-2 bi bi-info-circle"></i>
                             <span class="align-middle">FAQ</span>
                         </a>
                     </li>
@@ -76,32 +76,32 @@
             <!-- Reports Menu with Submenus -->
             <li class="sidebar-item" [ngClass]="{'active': isReportsMenuOpen || isSubmenuActive(['/reports/sales-report', '/reports/user-report', '/reports/error-report', '/reports/login-report'])}">
                 <a class="sidebar-link d-flex align-items-center collapsed" data-bs-toggle="collapse" href="#reportsMenu" role="button" aria-expanded="false" aria-controls="reportsMenu" (click)="toggleMenu('reports')">
-                    <i class="align-middle me-2" data-feather="bar-chart-2"></i>
+                    <i class="align-middle me-2 bi bi-bar-chart"></i>
                     <span class="align-middle">Reports</span>
-                    <i class="align-middle ms-auto" data-feather="chevron-down"></i>
+                    <i class="align-middle ms-auto bi bi-chevron-down"></i>
                 </a>
                 <ul class="collapse list-unstyled ps-4" id="reportsMenu" [ngClass]="{'show': isReportsMenuOpen}">
                     <li class="sidebar-item" [ngClass]="{'active': isActive('/reports/sales')}">
                         <a class="sidebar-link d-flex align-items-center" [routerLink]="'/reports/sales-report'" (click)="activateSubmenu('reports')">
-                            <i class="align-middle me-2" data-feather="dollar-sign"></i>
+                            <i class="align-middle me-2 bi bi-currency-dollar"></i>
                             <span class="align-middle">Sales Report</span>
                         </a>
                     </li>
                     <li class="sidebar-item" [ngClass]="{'active': isActive('/reports/users')}">
                         <a class="sidebar-link d-flex align-items-center" [routerLink]="'/reports/user-report'" (click)="activateSubmenu('reports')">
-                            <i class="align-middle me-2" data-feather="users"></i>
+                            <i class="align-middle me-2 bi bi-people"></i>
                             <span class="align-middle">User Report</span>
                         </a>
                     </li>
                     <li class="sidebar-item" [ngClass]="{'active': isActive('/reports/error-report')}">
                         <a class="sidebar-link d-flex align-items-center" [routerLink]="'/reports/error-report'" (click)="activateSubmenu('reports')">
-                            <i class="align-middle me-2" data-feather="dollar-sign"></i>
+                            <i class="align-middle me-2 bi bi-currency-dollar"></i>
                             <span class="align-middle">Error Report</span>
                         </a>
                     </li>
                     <li class="sidebar-item" [ngClass]="{'active': isActive('/reports/login-report')}">
                         <a class="sidebar-link d-flex align-items-center" [routerLink]="'/reports/login-report'" (click)="activateSubmenu('reports')">
-                            <i class="align-middle me-2" data-feather="users"></i>
+                            <i class="align-middle me-2 bi bi-people"></i>
                             <span class="align-middle">Login Report</span>
                         </a>
                     </li>
